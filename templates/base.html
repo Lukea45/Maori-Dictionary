@@ -1,0 +1,67 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<link href="{{ url_for('static', filename='css/dictionary.css') }}" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Suez+One&display=swap" rel="stylesheet">
+	<title>{% block title %}{% endblock %}</title>
+	<meta name="Description" content="Author: L Armstrong, Content: A dictionary to convert maori words to english.">
+</head>
+
+<body>
+	<div id="container">
+
+		<header>
+			<h1>{% block heading %}{% endblock %}</h1>
+		</header>
+
+		<nav>
+            <input type="checkbox" name="drop_down_menu" />
+			<span></span>
+			<span></span>
+			<span></span>
+			<ul>
+                <li><a href="/">Home</a></li>
+				<li><a href="/action">Action</a></li>
+				<li><a href="/animals">Animals</a></li>
+				<li><a href="/clothing">Clothing</a></li>
+				<li><a href="/culture">Culture</a></li>
+				<li><a href="/descriptive">Descriptive</a></li>
+				<li><a href="/edibles">Edibles</a></li>
+				<li><a href="/emotions">Emotions</a></li>
+				<li><a href="/garbage">Garbage</a></li>
+				<li><a href="/number">Number</a></li>
+				<li><a href="/outdoors">Outdoors</a></li>
+				<li><a href="/people">People</a></li>
+				<li><a href="/places">Places</a></li>
+				<li><a href="/plants">Plants</a></li>
+				<li><a href="/school">School</a></li>
+				<li><a href="/sport">Sport</a></li>
+				<li><a href="/technology">Technology</a></li>
+				<li><a href="/time">Time</a></li>
+
+			</ul>
+		</nav>
+
+
+		<!--
+		=====================================================
+		== Content row of the template.                 ==
+		=====================================================
+		-->
+
+		<main>
+            {% block main%}{% endblock %}
+        </main>
+
+
+		<footer>
+			<p>
+				&copy; Luke Armstrong
+			</p>
+		</footer>
+
+	</div>
+</body>
+</html>
