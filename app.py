@@ -4,9 +4,34 @@ from sqlite3 import Error
 from datetime import datetime
 app = Flask(__name__)
 
+DATABASE = "dictionary.db"
+
+
+def create_connection(db_file):
+    try:
+        connection = sqlite3.connect(db_file)
+        return connection
+    except Error as e:
+        print(e)
+    return none
+
+def get_categories():
+    con = create_connection(DATABASE)
+    query = "SELECT id, name FROM category"
+    cur = con.cursor()
+    cur.execute(query)
+    categories = cur.fetchall()
+    con.close()
+    return categories
+
+@app.route('/category/<catID>')
+def categories(catID):
+    return render_template("category.html", categories=get_categories())
+
+
 @app.route('/')
 def render_homepage():
-    return render_template("home.html")
+    return render_template("home.html", categories=get_categories())
 
 
 
@@ -18,7 +43,7 @@ def login():
         password = request.form.get('password')
 
         con = create_connection(DATABASE)
-        query = 'SELECT id, fname FROM users WHERE email=? AND password=?'
+        query = 'SELECT id, fname FROM student_users WHERE email=? AND password=?'
         cur = con.cursor()
         cur.execute(query, (email, password))
         user_data = cur.fetchall()
@@ -59,7 +84,7 @@ def signup():
 
         con = create_connection(DATABASE)
 
-        query = "INSERT INTO users (fname, lname, email, password) VALUES (?, ?, ?, ?)"
+        query = "INSERT INTO student_users (fname, lname, email, password) VALUES (?, ?, ?, ?)"
         cur = con.cursor()
         cur.execute(query, (fname, lname, email, password))
         con.commit()
