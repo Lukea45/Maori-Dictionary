@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
+
 app = Flask(__name__)
 
 DATABASE = "dictionary.db"
@@ -15,6 +16,7 @@ def create_connection(db_file):
         print(e)
     return none
 
+
 def get_categories():
     con = create_connection(DATABASE)
     query = "SELECT id, name FROM category"
@@ -25,14 +27,20 @@ def get_categories():
     return categories
 
 @app.route('/category/<catID>')
-def categories(catID):
-    return render_template("category.html", categories=get_categories())
+def render_home1(catID):
+    con = create_connection(DATABASE)
+    query = "SELECT id, maori, english, image FROM definitions WHERE category_id=? ORDER BY maori ASC"
+    cur = con.cursor()
+    cur.execute(query, (catID, ))
+    word_list = cur.fetchall()
+    con.close
+    return render_template("category.html", logged_in=is_logged_in(), categories=get_categories(), words=word_list)
+
 
 
 @app.route('/')
 def render_homepage():
     return render_template("home.html", categories=get_categories())
-
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -58,7 +66,7 @@ def login():
             session['users'] = users
             session['fname'] = first_name
 
-            return redirect("/menu")
+            return redirect("/")
 
         else:
             return redirect("/login?error=Incorrect+username+or+password")
@@ -96,9 +104,6 @@ def signup():
         error = ""
 
     return render_template("signup.html", error=error)
-
-
-
 
 
 app.run(host='0.0.0.0', debug=True)
