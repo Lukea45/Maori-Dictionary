@@ -6,7 +6,15 @@ from datetime import datetime
 app = Flask(__name__)
 
 DATABASE = "dictionary.db"
+app.secret_key = "chacha"
 
+def is_logged_in():
+    if session.get('email') is None:
+        print('logged out')
+        return False
+    else:
+        print('logged in')
+        return True
 
 def create_connection(db_file):
     try:
@@ -27,7 +35,7 @@ def get_categories():
     return categories
 
 @app.route('/category/<catID>')
-def render_home1(catID):
+def category(catID):
     con = create_connection(DATABASE)
     query = "SELECT id, maori, english, image FROM definitions WHERE category_id=? ORDER BY maori ASC"
     cur = con.cursor()
@@ -36,7 +44,21 @@ def render_home1(catID):
     con.close
     return render_template("category.html", logged_in=is_logged_in(), categories=get_categories(), words=word_list)
 
-
+@app.route('/word/<ID>')
+def word(ID):
+    con = create_connection(DATABASE)
+    query = "SELECT id, maori, english, image, definition, editor_id, editted FROM definitions WHERE id=? ORDER BY maori ASC"
+    cur = con.cursor()
+    cur.execute(query, (ID, ))
+    word_list = cur.fetchall()
+    print(word_list)
+    query = "SELECT * FROM student_users WHERE id=?"
+    cur = con.cursor()
+    cur.execute(query, (word_list[0][5], ))
+    editor_list = cur.fetchall()
+    print(editor_list)
+    con.close()
+    return render_template("word.html", logged_in=is_logged_in(), categories=get_categories(), word=word_list[0], editor=editor_list[0])
 
 @app.route('/')
 def render_homepage():

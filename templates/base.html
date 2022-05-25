@@ -24,7 +24,8 @@
 			<ul>
                 <li><a href="/">Home</a></li>
 				{% for category in categories %}
-				<li><a href="/category/{{ category[0] }}">{{ category[1]}} </a></li>
+				<li>
+					<a href="/category/{{ category[0] }}">{{ category[1]}} </a></li>
 				{% endfor %}
 				<br><li><a href="/login">Login</a></li>
 			</ul>
