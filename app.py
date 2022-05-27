@@ -52,7 +52,7 @@ def word(ID):
     cur.execute(query, (ID, ))
     word_list = cur.fetchall()
     print(word_list)
-    query = "SELECT * FROM student_users WHERE id=?"
+    query = "SELECT * FROM users WHERE id=?"
     cur = con.cursor()
     cur.execute(query, (word_list[0][5], ))
     editor_list = cur.fetchall()
@@ -62,8 +62,14 @@ def word(ID):
 
 @app.route('/')
 def render_homepage():
-    return render_template("home.html", categories=get_categories())
+    return render_template("home.html", categories=get_categories(), logged_in=is_logged_in())
 
+@app.route('/logout')
+def render_logout():
+    print(list(session.keys()))
+    [session.pop(key) for key in list(session.keys())]
+    print(list(session.keys()))
+    return redirect('/')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -73,7 +79,7 @@ def login():
         password = request.form.get('password')
 
         con = create_connection(DATABASE)
-        query = 'SELECT id, fname FROM student_users WHERE email=? AND password=?'
+        query = 'SELECT id, fname FROM users WHERE email=? AND password=?'
         cur = con.cursor()
         cur.execute(query, (email, password))
         user_data = cur.fetchall()
@@ -105,6 +111,7 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
         password2 = request.form.get('confirm_password')
+        teacher = request.form.get('teacher')
 
         if password != password2:
             return redirect("/signup?error=Please+make+password+match")
@@ -114,9 +121,9 @@ def signup():
 
         con = create_connection(DATABASE)
 
-        query = "INSERT INTO student_users (fname, lname, email, password) VALUES (?, ?, ?, ?)"
+        query = "INSERT INTO users (fname, lname, email, password, teacher) VALUES (?, ?, ?, ?, ?)"
         cur = con.cursor()
-        cur.execute(query, (fname, lname, email, password))
+        cur.execute(query, (fname, lname, email, password, teacher))
         con.commit()
         con.close()
         return redirect("/login")
@@ -127,5 +134,29 @@ def signup():
 
     return render_template("signup.html", error=error)
 
+@app.route('/add_word', methods=['POST', 'GET'])
+def add_word():
+    if request.method == 'POST':
+        print(request.form)
+        maori = request.form.get('maori_word').title().strip()
+        english = request.form.get('english_word').title().strip()
+        cat_id = request.form.get('category')
+        date_added = datetime.now()
+        definition = request.form.get('definition_word')
+        editor_id = session['user_id']
+        level = request.form.get('ylevel')
+        editted = datetime.now()
+        image = 'noimage.png'
+
+        create_connection(DATABASE)
+
+        query = "INSERT INTO defintions(maori, english, cat_id, date_added, definition, editor_id, level, editted, image, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        cur = con.cursor()
+        cur.execute(query, (maori, english, cat_id, date_added, definition, editor_id, level, editted, image))
+        con.commit()
+        con.close()
+
+        return redirect('/')
+    return render_template("addword.html", logged_in=is_logged_in(), categories=get_categories())
 
 app.run(host='0.0.0.0', debug=True)

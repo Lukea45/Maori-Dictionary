@@ -27,7 +27,11 @@
 				<li>
 					<a href="/category/{{ category[0] }}">{{ category[1]}} </a></li>
 				{% endfor %}
+				{% if logged_in %}
+				<br><li><a href="/logout">Logout</a></li>
+				{% else %}
 				<br><li><a href="/login">Login</a></li>
+				{% endif %}
 			</ul>
 		</nav>
 
