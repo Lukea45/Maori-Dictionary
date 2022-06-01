@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | DELETE {{ words[0][1] }}{% endblock %}
+
+{% block main %}
+
+    {% if logged_in %}
+        <h2>Confirm Delete {{ words[0][1] }} ({{ words[0][2] }})</h2>
+
+
+        <form class="dataform" method="post">
+            <h3>Delete Word: {{ words[0][1] }}</h3>
+            <p style="color: white">WARNING: This action cannot be undone<br><br></p>
+
+            <div>
+                <div></div>
+                <div><input class="button" type="submit" value="CONFIRM DELETE"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="button" class="button" value="CANCEL"
+                            onclick="window.location.href='/editword/{{ words[0][0] }}'">
+                </div>
+            </div>
+        </form>
+    {% else %}
+        <p>You must be logged in to delete a word in the Maori Dictionary.</p>
+    {% endif %}
+
+
+{% endblock %}

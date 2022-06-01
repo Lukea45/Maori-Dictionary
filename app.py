@@ -5,8 +5,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-DATABASE = "dictionary.db"
+DATABASE = "C:/Users/18039/PycharmProjects/Maori-Dictionary/dictionary.db"
 app.secret_key = "chacha"
+
 
 def is_logged_in():
     if session.get('email') is None:
@@ -16,13 +17,14 @@ def is_logged_in():
         print('logged in')
         return True
 
+
 def create_connection(db_file):
     try:
         connection = sqlite3.connect(db_file)
         return connection
     except Error as e:
         print(e)
-    return none
+    return None
 
 
 def get_categories():
@@ -34,35 +36,40 @@ def get_categories():
     con.close()
     return categories
 
+
 @app.route('/category/<catID>')
 def category(catID):
     con = create_connection(DATABASE)
     query = "SELECT id, maori, english, image FROM definitions WHERE category_id=? ORDER BY maori ASC"
     cur = con.cursor()
-    cur.execute(query, (catID, ))
+    cur.execute(query, (catID,))
     word_list = cur.fetchall()
     con.close
     return render_template("category.html", logged_in=is_logged_in(), categories=get_categories(), words=word_list)
+
 
 @app.route('/word/<ID>')
 def word(ID):
     con = create_connection(DATABASE)
     query = "SELECT id, maori, english, image, definition, editor_id, editted FROM definitions WHERE id=? ORDER BY maori ASC"
     cur = con.cursor()
-    cur.execute(query, (ID, ))
+    cur.execute(query, (ID,))
     word_list = cur.fetchall()
     print(word_list)
     query = "SELECT * FROM users WHERE id=?"
     cur = con.cursor()
-    cur.execute(query, (word_list[0][5], ))
+    cur.execute(query, (word_list[0][5],))
     editor_list = cur.fetchall()
     print(editor_list)
     con.close()
-    return render_template("word.html", logged_in=is_logged_in(), categories=get_categories(), word=word_list[0], editor=editor_list[0])
+    return render_template("word.html", logged_in=is_logged_in(), categories=get_categories(), word=word_list[0],
+                           editor=editor_list[0])
+
 
 @app.route('/')
 def render_homepage():
     return render_template("home.html", categories=get_categories(), logged_in=is_logged_in())
+
 
 @app.route('/logout')
 def render_logout():
@@ -71,12 +78,15 @@ def render_logout():
     print(list(session.keys()))
     return redirect('/')
 
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         print(request.form)
         email = request.form.get('email')
         password = request.form.get('password')
+
+
 
         con = create_connection(DATABASE)
         query = 'SELECT id, fname FROM users WHERE email=? AND password=?'
@@ -134,29 +144,31 @@ def signup():
 
     return render_template("signup.html", error=error)
 
+
 @app.route('/add_word', methods=['POST', 'GET'])
 def add_word():
     if request.method == 'POST':
         print(request.form)
         maori = request.form.get('maori_word').title().strip()
         english = request.form.get('english_word').title().strip()
-        cat_id = request.form.get('category')
+        category_id = request.form.get('category')
         date_added = datetime.now()
         definition = request.form.get('definition_word')
-        editor_id = session['user_id']
-        level = request.form.get('ylevel')
+        editor_id = session['users']
+        level = request.form.get('word_level')
         editted = datetime.now()
         image = 'noimage.png'
 
-        create_connection(DATABASE)
+        con = create_connection(DATABASE)
 
-        query = "INSERT INTO defintions(maori, english, cat_id, date_added, definition, editor_id, level, editted, image, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        query = "INSERT INTO definitions(maori, english, category_id, date_added, definition, editor_id, level, editted, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         cur = con.cursor()
-        cur.execute(query, (maori, english, cat_id, date_added, definition, editor_id, level, editted, image))
+        cur.execute(query, (maori, english, category_id, date_added, definition, editor_id, level, editted, image))
         con.commit()
         con.close()
 
         return redirect('/')
     return render_template("addword.html", logged_in=is_logged_in(), categories=get_categories())
+
 
 app.run(host='0.0.0.0', debug=True)
