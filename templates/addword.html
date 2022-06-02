@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Maōri Dictionary | Home{% endblock %}
+
+{% block heading %}Maōri - English Dictionary{% endblock %}
+
+{% block main %}
+        <form class="dataForm" method="post">
+            <div>
+                <div><label for="maori_word">Maori Word:</label></div>
+                <div><input type="text" name="maori_word" id="maori_word" required placeholder="Maori Word..."></div>
+            </div>
+
+            <div>
+                <div><label for="english_word">English Translation:</label></div>
+                <div><input type="text" name="english_word" id="english_word" required placeholder="English Translation..."></div>
+            </div>
+
+            <div>
+                <div><label for="definition_word">Definition:</label></div>
+                <div><textarea name="definition_word" id="definition_word" required placeholder="Definition of word..."></textarea></div>
+            </div>
+
+            <label for="category">category</label>
+            <select name="category" id="category">
+                {% for category in categories %}
+                    <option value={{category[0]}}> {{category[1]}}</option>
+                {% endfor %}
+            </select>
+          <div>
+                <div><br><label for="word_level">Word Level: <span id="rangeValue">3</span></label></div>
+                <div>
+                    <input type="range" min="1" max="10" value="3"
+                            name="word_level" id="word_level" required
+                            onChange="rangeSlide(this.value)"
+                            onmousemove="rangeSlide(this.value)">
+                </div>
+          </div>
+               <div>
+                <div></div>
+                <div><input class="button" type="reset"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input class="button" type="submit"></div>
+            </div>
+
+        </form>
+
+    <script type="text/javascript">
+        function rangeSlide(value) {
+            document.getElementById('rangeValue').innerHTML = value;
+        }
+    </script>
+
+{% endblock %}
